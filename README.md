@@ -2,9 +2,6 @@
 
 This package contains the data and R code used to replicate the empirical results reported in the paper:
 
-**Cezar, R., Camargo, J., Mello, E., Sun, Y., & De Franco, G.**  
-*Mixed Effects by Design? EU Biofuels and the Foreign Spillovers of Hybrid Climate Governance*  
-
 ## Structure
 
 All files are placed in a flat directory. The contents of this package include:

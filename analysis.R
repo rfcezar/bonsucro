@@ -21,6 +21,7 @@ data <- readxl::read_excel("bonsucro_replication/bonsucro_data.xls")
 ##################################################################################
 #Effects of Bonsucro-RED on Family Farms and Gender Gap
 ##################################################################################
+data$X_WEIGHTS <- data[["_weight"]]
 
 prop_af_red <- lm(PROP_AF ~ RED_TREATED * DUMMY_YEAR +
                  PARTIDO_PT + SHARE_PT + CANA_HEC + UNI_LOC_CANA +
@@ -310,3 +311,4 @@ ggsave("comparative_plot.jpeg", plot = comp.plot, width = 8000, height = 6000, u
 sink("session_info.txt")
 sessionInfo()
 sink()
+

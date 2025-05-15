@@ -17,51 +17,40 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
- [1] viridis_0.6.5           viridisLite_0.4.2       geobr_1.9.1            
- [4] writexl_1.5.0           datazoom.amazonia_1.1.0 fect_1.0.0             
- [7] hrbrthemes_0.8.7        did_2.1.2               panelView_1.1.18       
-[10] broom_1.0.6             lubridate_1.9.3         forcats_1.0.0          
-[13] stringr_1.5.1           dplyr_1.1.4             purrr_1.0.2            
-[16] readr_2.1.5             tidyr_1.3.1             tibble_3.2.1           
-[19] ggplot2_3.5.1           tidyverse_2.0.0         MatchIt_4.5.5          
-[22] readxl_1.4.3           
+ [1] MatchIt_4.5.5    broom_1.0.6      lubridate_1.9.3  forcats_1.0.0    stringr_1.5.1   
+ [6] dplyr_1.1.4      purrr_1.0.2      readr_2.1.5      tidyr_1.3.1      tibble_3.2.1    
+[11] tidyverse_2.0.0  panelView_1.1.18 ggplot2_3.5.1    hrbrthemes_0.8.7 did_2.1.2       
+[16] readxl_1.4.3    
 
 loaded via a namespace (and not attached):
-  [1] RColorBrewer_1.1-3      rstudioapi_0.16.0       magrittr_2.0.3         
-  [4] farver_2.1.2            ragg_1.3.2              vctrs_0.6.5            
-  [7] rstatix_0.7.2           htmltools_0.5.8.1       curl_6.2.2             
- [10] cellranger_1.1.0        Formula_1.2-5           pROC_1.18.5            
- [13] caret_6.0-94            parallelly_1.38.0       KernSmooth_2.23-24     
- [16] plyr_1.8.9              sandwich_3.1-0          zoo_1.8-12             
- [19] uuid_1.2-0              lifecycle_1.0.4         iterators_1.0.14       
- [22] pkgconfig_2.0.3         Matrix_1.7-0            R6_2.5.1               
- [25] fastmap_1.2.0           future_1.34.0           digest_0.6.36          
- [28] numDeriv_2016.8-1.1     colorspace_2.1-0        GGally_2.2.1           
- [31] fixest_0.12.1           textshaping_0.4.0       ggpubr_0.6.0           
- [34] labeling_0.4.3          fansi_1.0.6             timechange_0.3.0       
- [37] abind_1.4-5             compiler_4.4.1          rngtools_1.5.2         
- [40] proxy_0.4-27            fontquiver_0.2.1        withr_3.0.0            
- [43] doParallel_1.0.17       backports_1.5.0         carData_3.0-5          
- [46] DBI_1.2.3               ggstats_0.6.0           Rttf2pt1_1.3.12        
- [49] ggsignif_0.6.4          MASS_7.3-60.2           lava_1.8.0             
- [52] classInt_0.4-10         units_0.8-5             ModelMetrics_1.2.2.2   
- [55] tools_4.4.1             trust_0.1-8             extrafontdb_1.0        
- [58] future.apply_1.11.2     nnet_7.3-19             glue_1.7.0             
- [61] nlme_3.1-164            stringmagic_1.1.2       grid_4.4.1             
- [64] sf_1.0-16               reshape2_1.4.4          generics_0.1.3         
- [67] recipes_1.1.0           gtable_0.3.6            tzdb_0.4.0             
- [70] class_7.3-22            fastglm_0.0.3           data.table_1.15.4      
- [73] hms_1.1.3               car_3.1-2               utf8_1.2.4             
- [76] foreach_1.5.2           pillar_1.9.0            splines_4.4.1          
- [79] lattice_0.22-6          survival_3.6-4          dreamerr_1.4.0         
- [82] tidyselect_1.2.1        fontLiberation_0.1.0    BMisc_1.4.8            
- [85] fontBitstreamVera_0.1.1 bigmemory.sri_0.1.8     gridExtra_2.3          
- [88] stats4_4.4.1            DRDID_1.2.0             hardhat_1.4.0          
- [91] timeDate_4032.109       stringi_1.8.4           codetools_0.2-20       
- [94] extrafont_0.19          gdtools_0.4.2           cli_3.6.3              
- [97] rpart_4.1.23            systemfonts_1.1.0       munsell_0.5.1          
-[100] Rcpp_1.0.12             globals_0.16.3          bigmemory_4.6.4        
-[103] parallel_4.4.1          gower_1.0.1             doRNG_1.8.6.2          
-[106] listenv_0.9.1           mvtnorm_1.2-5           ipred_0.9-15           
-[109] scales_1.3.0            prodlim_2024.06.25      e1071_1.7-14           
-[112] rlang_1.1.4            
+ [1] pROC_1.18.5             gridExtra_2.3           DRDID_1.2.0            
+ [4] rlang_1.1.4             magrittr_2.0.3          compiler_4.4.1         
+ [7] systemfonts_1.1.0       vctrs_0.6.5             reshape2_1.4.4         
+[10] pkgconfig_2.0.3         fastmap_1.2.0           backports_1.5.0        
+[13] labeling_0.4.3          utf8_1.2.4              prodlim_2024.06.25     
+[16] tzdb_0.4.0              ragg_1.3.2              trust_0.1-8            
+[19] recipes_1.1.0           fastglm_0.0.3           chk_0.10.0             
+[22] uuid_1.2-0              parallel_4.4.1          R6_2.5.1               
+[25] stringi_1.8.4           parallelly_1.38.0       car_3.1-2              
+[28] extrafontdb_1.0         rpart_4.1.23            cellranger_1.1.0       
+[31] Rcpp_1.0.12             iterators_1.0.14        BMisc_1.4.8            
+[34] future.apply_1.11.2     extrafont_0.19          Matrix_1.7-0           
+[37] splines_4.4.1           nnet_7.3-19             timechange_0.3.0       
+[40] tidyselect_1.2.1        rstudioapi_0.16.0       abind_1.4-5            
+[43] timeDate_4032.109       codetools_0.2-20        listenv_0.9.1          
+[46] lattice_0.22-6          plyr_1.8.9              withr_3.0.0            
+[49] future_1.34.0           survival_3.6-4          pillar_1.9.0           
+[52] ggpubr_0.6.0            carData_3.0-5           foreach_1.5.2          
+[55] stats4_4.4.1            generics_0.1.3          hms_1.1.3              
+[58] munsell_0.5.1           scales_1.3.0            globals_0.16.3         
+[61] class_7.3-22            glue_1.7.0              gdtools_0.4.2          
+[64] tools_4.4.1             data.table_1.15.4       ModelMetrics_1.2.2.2   
+[67] gower_1.0.1             ggsignif_0.6.4          grid_4.4.1             
+[70] bigmemory_4.6.4         Rttf2pt1_1.3.12         ipred_0.9-15           
+[73] colorspace_2.1-0        nlme_3.1-164            cli_3.6.3              
+[76] textshaping_0.4.0       fontBitstreamVera_0.1.1 bigmemory.sri_0.1.8    
+[79] fansi_1.0.6             lava_1.8.0              gtable_0.3.6           
+[82] rstatix_0.7.2           digest_0.6.36           fontquiver_0.2.1       
+[85] caret_6.0-94            farver_2.1.2            htmltools_0.5.8.1      
+[88] lifecycle_1.0.4         hardhat_1.4.0           fontLiberation_0.1.0   
+[91] MASS_7.3-60.2          

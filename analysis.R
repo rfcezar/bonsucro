@@ -1,7 +1,5 @@
 # Replication script for:
 # "Mixed Effects by Design? EU Biofuels and the Foreign Spillovers of Hybrid Climate Governance"
-# Authors: Rodrigo F. Cezar, Juliana Camargo, Eduardo Mello, Yixian Sun, Guilherme De Franco
-# Contact: rodrigo.cezar@fgv.br
 
 rm(list = ls())
 set.seed(123)

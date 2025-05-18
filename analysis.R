@@ -16,7 +16,7 @@ library(readxl)
 library(hrbrthemes)
 library(broom)
 
-data <- readxl::read_excel("bonsucro_replication/bonsucro_data.xls")
+data <- readxl::read_excel("bonsucro_data.xlsx")
 
 ##################################################################################
 #Effects of Bonsucro-RED on Family Farms and Gender Gap
@@ -129,7 +129,7 @@ dr.upper.eff <- aggte(dr.upper, type = "dynamic", na.rm = TRUE)
 #################################################################################
 
 # Load deforestation data
-deforestation <- read.csv(gzfile("C:/Users/rfcez/Downloads/br_inpe_prodes_municipio_bioma.gz")) %>%
+deforestation <- read.csv(gzfile("br_inpe_prodes_municipio_bioma.gz")) %>%
   rename(
     CO_MUN = id_municipio,
     YEAR = ano

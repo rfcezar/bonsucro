@@ -1,4 +1,4 @@
-packages <- c("did", "readxl", "broom", "tidyverse", "panelView", "hrbrthemes", "ggplot2")
+packages <- c("did", "readxl", "broom", "tidyverse", "panelView", "hrbrthemes", "ggplot2", "psych", "xtable")
 
 missing <- setdiff(packages, rownames(installed.packages()))
 if (length(missing) > 0) {

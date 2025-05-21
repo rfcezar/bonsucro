@@ -13,6 +13,8 @@ library(tidyverse)
 library(readxl)
 library(hrbrthemes)
 library(broom)
+library(psych)
+library(xtable)
 
 data <- readxl::read_excel("bonsucro_data.xlsx")
 
@@ -136,7 +138,7 @@ deforestation <- read.csv(gzfile("br_inpe_prodes_municipio_bioma.gz")) %>%
   group_by(CO_MUN, YEAR) %>%
   arrange(CO_MUN, YEAR) %>%
   summarise(
-    INCREMENTO = mean(desmatado - lag(desmatado), na.rm = TRUE),
+    INCREMENTO = mean(desmatado - dplyr::lag(desmatado), na.rm = TRUE),
     .groups = "drop"
   ) %>%
   drop_na()
@@ -145,14 +147,17 @@ deforestation <- deforestation %>%
   mutate(YEAR = as.integer(YEAR))
 
 # Merging final dataset with deforestation data
-data_final_eeu <- left_join(
-  data_final_eeu,
+data <- left_join(
+  data,
   deforestation,
   by = c("CO_MUN", "YEAR")
 )
 
-data_final_eeu <- data_final_eeu %>% 
+data <- data %>% 
   mutate(INCREMENTO = ifelse(is.na(INCREMENTO),0,INCREMENTO))
+
+data <- data %>%
+  mutate(FIRST_TREAT_YEAR_RED = as.numeric(FIRST_TREAT_YEAR_RED))
 
 dr.overall.deforestation <- att_gt(yname = "INCREMENTO",
                                    gname = "FIRST_TREAT_YEAR_RED",
@@ -161,7 +166,7 @@ dr.overall.deforestation <- att_gt(yname = "INCREMENTO",
                                    xformla = ~ 1,
                                    biters = 1000,
                                    control_group = "notyettreated",
-                                   data = data_final_eeu)
+                                   data = data)
 
 dr.overall.deforestation.eff <- aggte(dr.overall.deforestation, type = "dynamic", na.rm = TRUE)
 
@@ -237,7 +242,7 @@ gg.af.plot <- ggplot(att_red_df, aes(x = Variável, y = ATT)) +
 
 ggsave("gg.af_plot.jpeg", plot = gg.af.plot, width = 8000, height = 6000, units = "px", dpi = 1000)
 
-# Exports, Deforestation and Labor Allocation
+# Exports
 
 create_att_plot <- function(model_eff, model_name, output_filename) {
   anos <- model_eff$egt
@@ -270,9 +275,105 @@ create_att_plot <- function(model_eff, model_name, output_filename) {
 create_att_plot(dr.overall.eff, "", "att_overall.jpeg")
 create_att_plot(dr.lower.eff, "", "att_lower.jpeg")
 create_att_plot(dr.upper.eff, "", "att_upper.jpeg")
-create_att_plot(dr.labor.0.4.eff, "", "att_labor_0_4.jpeg")
-create_att_plot(dr.labor.0.9.eff, "", "att_labor_0_9.jpeg")
-create_att_plot(dr.overall.deforestation.eff, "", "att_overall_deforestation.jpeg")
+
+
+#Deforestation
+
+create_att_plot_2 <- function(model_eff, model_name, output_filename) {
+  anos <- model_eff$egt
+  att_egt <- model_eff$att.egt
+  se <- model_eff$se.egt
+  cv <- model_eff$crit.val.egt
+  model_eff_df <- as_tibble(cbind(anos, att_egt, se, cv))
+  
+  # Create the plot
+  p <- ggplot(data = model_eff_df, aes(x = anos, y = att_egt)) +
+    geom_point(aes(color = ifelse(anos < 0, "Pre-Treatment", "Post-Treatment"))) +
+    geom_errorbar(aes(ymin = att_egt - se * cv, ymax = att_egt + se * cv), width = 0.2) +
+    geom_hline(yintercept = 0, linetype = "dashed") +
+    labs(x = "Years", y = "Average Treatment Effect on the Treated") +
+    ggtitle(paste("", model_name)) +
+    theme_ipsum(base_size = 12, base_family = "Arial", grid = "Y") +
+    theme(plot.background = element_rect(fill = "white", color = NA),
+          panel.background = element_rect(fill = "white", color = NA)) +
+    labs(caption = "Dependent variable: Deforestation rate.\nControl group: not yet treated municipalities with non-certified sugar producers that export to the EU.") +
+    scale_x_continuous(breaks = unique(model_eff_df$anos)) +
+    scale_color_manual(values = c("Pre-Treatment" = "red", "Post-Treatment" = "black")) +
+    labs(color = "Period") +
+    guides(color = guide_legend(title = "Period"))
+  
+  # Save the plot
+  ggsave(output_filename, plot = p, width = 8000, height = 6000, units = "px", dpi = 1000)
+}
+
+# Create and save plots for each model
+create_att_plot_2(dr.overall.deforestation.eff, "", "att_overall_deforestation.jpeg")
+
+
+#Labor Allocation (≥ 4 workers)
+
+create_att_plot_3 <- function(model_eff, model_name, output_filename) {
+  anos <- model_eff$egt
+  att_egt <- model_eff$att.egt
+  se <- model_eff$se.egt
+  cv <- model_eff$crit.val.egt
+  model_eff_df <- as_tibble(cbind(anos, att_egt, se, cv))
+  
+  # Create the plot
+  p <- ggplot(data = model_eff_df, aes(x = anos, y = att_egt)) +
+    geom_point(aes(color = ifelse(anos < 0, "Pre-Treatment", "Post-Treatment"))) +
+    geom_errorbar(aes(ymin = att_egt - se * cv, ymax = att_egt + se * cv), width = 0.2) +
+    geom_hline(yintercept = 0, linetype = "dashed") +
+    labs(x = "Years", y = "Average Treatment Effect on the Treated") +
+    ggtitle(paste("", model_name)) +
+    theme_ipsum(base_size = 12, base_family = "Arial", grid = "Y") +
+    theme(plot.background = element_rect(fill = "white", color = NA),
+          panel.background = element_rect(fill = "white", color = NA)) +
+    labs(caption = "Dependent variable: Proportion of agriculture units ≥ 4 workers.\nControl group: not yet treated municipalities with non-certified sugar producers.") +
+    scale_x_continuous(breaks = unique(model_eff_df$anos)) +
+    scale_color_manual(values = c("Pre-Treatment" = "red", "Post-Treatment" = "black")) +
+    labs(color = "Period") +
+    guides(color = guide_legend(title = "Period"))
+  
+  # Save the plot
+  ggsave(output_filename, plot = p, width = 8000, height = 6000, units = "px", dpi = 1000)
+}
+
+# Create and save plots for each model
+create_att_plot_3(dr.labor.0.4.eff, "", "att_labor_0_4.jpeg")
+
+#Labor Allocation (≥ 9 workers)
+
+create_att_plot_4 <- function(model_eff, model_name, output_filename) {
+  anos <- model_eff$egt
+  att_egt <- model_eff$att.egt
+  se <- model_eff$se.egt
+  cv <- model_eff$crit.val.egt
+  model_eff_df <- as_tibble(cbind(anos, att_egt, se, cv))
+  
+  # Create the plot
+  p <- ggplot(data = model_eff_df, aes(x = anos, y = att_egt)) +
+    geom_point(aes(color = ifelse(anos < 0, "Pre-Treatment", "Post-Treatment"))) +
+    geom_errorbar(aes(ymin = att_egt - se * cv, ymax = att_egt + se * cv), width = 0.2) +
+    geom_hline(yintercept = 0, linetype = "dashed") +
+    labs(x = "Years", y = "Average Treatment Effect on the Treated") +
+    ggtitle(paste("", model_name)) +
+    theme_ipsum(base_size = 12, base_family = "Arial", grid = "Y") +
+    theme(plot.background = element_rect(fill = "white", color = NA),
+          panel.background = element_rect(fill = "white", color = NA)) +
+    labs(caption = "Dependent variable: Proportion of agriculture units ≥ 9 workers.\nControl group: not yet treated municipalities with non-certified sugar producers.") +
+    scale_x_continuous(breaks = unique(model_eff_df$anos)) +
+    scale_color_manual(values = c("Pre-Treatment" = "red", "Post-Treatment" = "black")) +
+    labs(color = "Period") +
+    guides(color = guide_legend(title = "Period"))
+  
+  # Save the plot
+  ggsave(output_filename, plot = p, width = 8000, height = 6000, units = "px", dpi = 1000)
+}
+
+# Create and save plots for each model
+create_att_plot_4(dr.labor.0.9.eff, "", "att_labor_0_9.jpeg")
+
 
 #Summaries of all ATTs to create comparative plot
 att_objs <- list(
@@ -305,6 +406,203 @@ comp.plot <- ggplot(att_staggered_df, aes(x = Variável, y = ATT)) +
   theme(axis.text.x = element_text(angle = 30, hjust = 1))
 
 ggsave("comparative_plot.jpeg", plot = comp.plot, width = 8000, height = 6000, units = "px", dpi = 1000)
+
+
+##################################################################################
+#APPENDIX 
+##################################################################################
+
+##################################################################################
+#Summary of data for the Effects on Family Farms and Gender Gap 
+#(data from the Census, only for 2006 and 2017)
+##################################################################################
+
+summary_table_census <- describe(data[, c("PROP_AF", "GENDER_GAP", "RED_TREATED", "PARTIDO_PT", "SHARE_PT", "CANA_HEC", "UNI_LOC_CANA", "UNI_LOC_ALC", "INCREMENTO")])
+summary_table_census <- summary_table_census[, !colnames(summary_table_census) %in% c("vars")]
+colnames(summary_table_census) <- c("N", "Mean", "St. Dev.", "Median", "Trimmed", "MAD", "Min", "Max", "Range", "Skew", "Kurtosis", "St. Error")
+
+print(summary_table_census)
+
+summary_table_census <- as.data.frame(t(summary_table_census))
+summary_table_census <- xtable(summary_table_census)
+
+print.xtable(summary_table_census, type = "latex")
+
+
+##################################################################################
+#Summary of data for the Effects on Trade and Deforestation 
+##################################################################################
+
+#Overall effect 
+
+summary_table_eeu <- describe(data_final_eeu[, c("EXPORT_EU", "RED_TREATED")])
+summary_table_eeu <- summary_table_eeu[, !colnames(summary_table_eeu) %in% c("vars")]
+colnames(summary_table_eeu) <- c("N", "Mean", "St. Dev.", "Median", "Trimmed", "MAD", "Min", "Max", "Range", "Skew", "Kurtosis", "St. Error")
+
+print(summary_table_eeu)
+
+summary_table_eeu <- as.data.frame(t(summary_table_eeu))
+summary_table_eeu <- xtable(summary_table_eeu)
+
+print.xtable(summary_table_eeu, type = "latex")
+
+#Lower deciles
+
+summary_lower <- describe(lower[, c("EXPORT_EU", "RED_TREATED")])
+summary_lower <- summary_lower[, !colnames(summary_lower) %in% c("vars")]
+colnames(summary_lower) <- c("N", "Mean", "St. Dev.", "Median", "Trimmed", "MAD", "Min", "Max", "Range", "Skew", "Kurtosis", "St. Error")
+
+print(summary_lower)
+
+summary_lower <- as.data.frame(t(summary_lower))
+summary_lower <- xtable(summary_lower)
+
+print.xtable(summary_lower, type = "latex")
+
+#Upper deciles 
+
+summary_upper <- describe(upper[, c("EXPORT_EU", "RED_TREATED")])
+summary_upper <- summary_upper[, !colnames(summary_upper) %in% c("vars")]
+colnames(summary_upper) <- c("N", "Mean", "St. Dev.", "Median", "Trimmed", "MAD", "Min", "Max", "Range", "Skew", "Kurtosis", "St. Error")
+
+print(summary_upper)
+
+summary_upper <- as.data.frame(t(summary_upper))
+summary_upper <- xtable(summary_upper)
+
+print.xtable(summary_upper, type = "latex")
+
+
+##################################################################################
+#Summary of data for the Effects on Agricultura Units 
+##################################################################################
+
+summary_table_data <- describe(data[, c("WORKERS_0_4_PER", "WORKERS_0_9_PER", "RED_TREATED")])
+summary_table_data <- summary_table_data[, !colnames(summary_table_data) %in% c("vars")]
+colnames(summary_table_data) <- c("N", "Mean", "St. Dev.", "Median", "Trimmed", "MAD", "Min", "Max", "Range", "Skew", "Kurtosis", "St. Error")
+
+print(summary_table_data)
+
+summary_table_data <- as.data.frame(t(summary_table_data))
+summary_table_data <- xtable(summary_table_data)
+
+print.xtable(summary_table_data, type = "latex")
+
+##################################################################################
+#Graph of treated municipalities 
+##################################################################################
+
+#For the effects on Family Agriculture, Gender Gap and Agriculture Units 
+
+treatment_data <- data %>%
+  group_by(CO_MUN) %>%
+  summarise(RED_TREATED = first(RED_TREATED)) %>%
+  filter(!is.na(RED_TREATED)) %>%              # <-- exclude NAs here
+  mutate(
+    RED_TREATED_LABEL = ifelse(RED_TREATED == 1, "Treated", "Untreated")
+  ) %>%
+  count(RED_TREATED_LABEL) %>%
+  ggplot(aes(x = RED_TREATED_LABEL, y = n, fill = RED_TREATED_LABEL)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = n), vjust = -0.5, fontface = "bold") +
+  scale_fill_manual(
+    values = c("Untreated" = "lightblue", "Treated" = "#003366")
+  ) +
+  labs(
+    title = "Number of Treated vs. Untreated Municipalities",
+    x = "",
+    y = "Number of Municipalities",
+    caption = "Note: Subset for the effects on family farms, gender gap and agriculture units."
+  ) +
+  theme_minimal() +
+  theme(legend.position = "none")
+
+ggsave("treatment_data.jpeg", plot = treatment_data, width = 8000, height = 6000, units = "px", dpi = 1000)
+
+
+#For the effects on trade (overall) and deforestation
+
+treatment_eeu <- data_final_eeu %>%
+  group_by(CO_MUN) %>%
+  summarise(RED_TREATED = first(RED_TREATED)) %>%
+  filter(!is.na(RED_TREATED)) %>%              # <-- exclude NAs here
+  mutate(
+    RED_TREATED_LABEL = ifelse(RED_TREATED == 1, "Treated", "Untreated")
+  ) %>%
+  count(RED_TREATED_LABEL) %>%
+  ggplot(aes(x = RED_TREATED_LABEL, y = n, fill = RED_TREATED_LABEL)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = n), vjust = -0.5, fontface = "bold") +
+  scale_fill_manual(
+    values = c("Untreated" = "lightblue", "Treated" = "#003366")
+  ) +
+  labs(
+    title = "Number of Treated vs. Untreated Municipalities",
+    x = "",
+    y = "Number of Municipalities",
+    caption = "Note: Subset for the effects on exports (overall) and deforestation."
+  ) +
+  theme_minimal() +
+  theme(legend.position = "none")
+
+ggsave("treatment_eeu.jpeg", plot = treatment_eeu, width = 8000, height = 6000, units = "px", dpi = 1000)
+
+
+#For the effects on trade (upper)
+
+treatment_upper <- upper %>%
+  group_by(CO_MUN) %>%
+  summarise(RED_TREATED = first(RED_TREATED)) %>%
+  filter(!is.na(RED_TREATED)) %>%              # <-- exclude NAs here
+  mutate(
+    RED_TREATED_LABEL = ifelse(RED_TREATED == 1, "Treated", "Untreated")
+  ) %>%
+  count(RED_TREATED_LABEL) %>%
+  ggplot(aes(x = RED_TREATED_LABEL, y = n, fill = RED_TREATED_LABEL)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = n), vjust = -0.5, fontface = "bold") +
+  scale_fill_manual(
+    values = c("Untreated" = "lightblue", "Treated" = "#003366")
+  ) +
+  labs(
+    title = "Number of Treated vs. Untreated Municipalities",
+    x = "",
+    y = "Number of Municipalities",
+    caption = "Note: Subset for the effects on exports (upper deciles)."
+  ) +
+  theme_minimal() +
+  theme(legend.position = "none")
+
+ggsave("treatment_upper.jpeg", plot = treatment_upper, width = 8000, height = 6000, units = "px", dpi = 1000)
+
+
+#For the effects on trade (lower)
+
+treatment_lower <- lower %>%
+  group_by(CO_MUN) %>%
+  summarise(RED_TREATED = first(RED_TREATED)) %>%
+  filter(!is.na(RED_TREATED)) %>%              # <-- exclude NAs here
+  mutate(
+    RED_TREATED_LABEL = ifelse(RED_TREATED == 1, "Treated", "Untreated")
+  ) %>%
+  count(RED_TREATED_LABEL) %>%
+  ggplot(aes(x = RED_TREATED_LABEL, y = n, fill = RED_TREATED_LABEL)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = n), vjust = -0.5, fontface = "bold") +
+  scale_fill_manual(
+    values = c("Untreated" = "lightblue", "Treated" = "#003366")
+  ) +
+  labs(
+    title = "Number of Treated vs. Untreated Municipalities",
+    x = "",
+    y = "Number of Municipalities",
+    caption = "Note: Subset for the effects on exports (lower deciles)."
+  ) +
+  theme_minimal() +
+  theme(legend.position = "none")
+
+ggsave("treatment_lower.jpeg", plot = treatment_lower, width = 8000, height = 6000, units = "px", dpi = 1000)
+
 
 sink("session_info.txt")
 sessionInfo()

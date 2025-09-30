@@ -125,6 +125,49 @@ dr.lower.eff <- aggte(dr.lower, type = "dynamic", na.rm = TRUE)
 dr.upper.eff <- aggte(dr.upper, type = "dynamic", na.rm = TRUE)
 
 #################################################################################
+# Robustness: Anticipation tests (2 years)
+#################################################################################
+
+# Overall with anticipation
+dr.overall.anticip <- att_gt(yname = "EXPORT_EU",
+                             gname = "FIRST_TREAT_YEAR_RED",
+                             idname = "CO_MUN",
+                             tname = "YEAR",
+                             xformla = ~ 1,
+                             biters = 1000,
+                             control_group = "notyettreated",
+                             anticipation = 2,
+                             data = data_final_eeu)
+
+dr.overall.anticip.eff <- aggte(dr.overall.anticip, type = "dynamic", na.rm = TRUE)
+
+# Lower with anticipation
+dr.lower.anticip <- att_gt(yname = "EXPORT_EU",
+                           gname = "FIRST_TREAT_YEAR_RED",
+                           idname = "CO_MUN",
+                           tname = "YEAR",
+                           xformla = ~ 1,
+                           biters = 1000,
+                           control_group = "notyettreated",
+                           anticipation = 2,
+                           data = lower)
+
+dr.lower.anticip.eff <- aggte(dr.lower.anticip, type = "dynamic", na.rm = TRUE)
+
+# Upper with anticipation
+dr.upper.anticip <- att_gt(yname = "EXPORT_EU",
+                           gname = "FIRST_TREAT_YEAR_RED",
+                           idname = "CO_MUN",
+                           tname = "YEAR",
+                           xformla = ~ 1,
+                           biters = 1000,
+                           control_group = "notyettreated",
+                           anticipation = 2,
+                           data = upper)
+
+dr.upper.anticip.eff <- aggte(dr.upper.anticip, type = "dynamic", na.rm = TRUE)
+
+#################################################################################
 #Effects of Bonsucro-RED on deforestation
 #################################################################################
 
@@ -171,6 +214,24 @@ dr.overall.deforestation <- att_gt(yname = "INCREMENTO",
 dr.overall.deforestation.eff <- aggte(dr.overall.deforestation, type = "dynamic", na.rm = TRUE)
 
 #################################################################################
+# Robustness: Anticipation tests (2 years)
+#################################################################################
+
+dr.overall.deforestation.anticip <- att_gt(yname = "INCREMENTO",
+                                           gname = "FIRST_TREAT_YEAR_RED",
+                                           idname = "CO_MUN",
+                                           tname = "YEAR",
+                                           xformla = ~ 1,
+                                           biters = 1000,
+                                           control_group = "notyettreated",
+                                           anticipation = 2,
+                                           data = data)
+
+dr.overall.deforestation.anticip.eff <- aggte(dr.overall.deforestation.anticip,
+                                              type = "dynamic",
+                                              na.rm = TRUE)
+
+#################################################################################
 #Effects of Bonsucro-RED on labor allocation
 #################################################################################
 
@@ -198,6 +259,40 @@ dr.labor.0.9 <- att_gt(yname = "WORKERS_0_9_PER",
                             data = data)
 
 dr.labor.0.9.eff <- aggte(dr.labor.0.9, type = "dynamic", na.rm = TRUE)
+
+#################################################################################
+# Robustness: Anticipation tests (2 years)
+#################################################################################
+
+# Units with 0 to 4 workers
+dr.labor.0.4.anticip <- att_gt(yname = "WORKERS_0_4_PER",
+                               gname = "FIRST_TREAT_YEAR_RED",
+                               idname = "CO_MUN",
+                               tname = "YEAR",
+                               xformla = ~ 1,
+                               biters = 1000,
+                               control_group = "notyettreated",
+                               anticipation = 2,  
+                               data = data)
+
+dr.labor.0.4.anticip.eff <- aggte(dr.labor.0.4.anticip,
+                                  type = "dynamic",
+                                  na.rm = TRUE)
+
+# Units with 0 to 9 workers
+dr.labor.0.9.anticip <- att_gt(yname = "WORKERS_0_9_PER",
+                               gname = "FIRST_TREAT_YEAR_RED",
+                               idname = "CO_MUN",
+                               tname = "YEAR",
+                               xformla = ~ 1,
+                               biters = 1000,
+                               control_group = "notyettreated",
+                               anticipation = 2,
+                               data = data)
+
+dr.labor.0.9.anticip.eff <- aggte(dr.labor.0.9.anticip,
+                                  type = "dynamic",
+                                  na.rm = TRUE)
 
 #################################################################################
 #Plotting the results
@@ -276,6 +371,11 @@ create_att_plot(dr.overall.eff, "", "att_overall.jpeg")
 create_att_plot(dr.lower.eff, "", "att_lower.jpeg")
 create_att_plot(dr.upper.eff, "", "att_upper.jpeg")
 
+# Create and save plots for robustness
+
+create_att_plot(dr.overall.anticip.eff, "", "att_overall_anticip.jpeg")
+create_att_plot(dr.lower.anticip.eff,   "", "att_lower_anticip.jpeg")
+create_att_plot(dr.upper.anticip.eff,   "", "att_upper_anticip.jpeg")
 
 #Deforestation
 
@@ -309,6 +409,8 @@ create_att_plot_2 <- function(model_eff, model_name, output_filename) {
 # Create and save plots for each model
 create_att_plot_2(dr.overall.deforestation.eff, "", "att_overall_deforestation.jpeg")
 
+# Create and save plot for robustness
+create_att_plot_2(dr.overall.deforestation.anticip.eff, "", "att_overall_deforestation_anticip.jpeg")
 
 #Labor Allocation (≥ 4 workers)
 
@@ -342,6 +444,9 @@ create_att_plot_3 <- function(model_eff, model_name, output_filename) {
 # Create and save plots for each model
 create_att_plot_3(dr.labor.0.4.eff, "", "att_labor_0_4.jpeg")
 
+# Create and save plots for robustness tests
+create_att_plot_3(dr.labor.0.4.anticip.eff, "", "att_labor_0_4_anticip.jpeg")
+
 #Labor Allocation (≥ 9 workers)
 
 create_att_plot_4 <- function(model_eff, model_name, output_filename) {
@@ -374,6 +479,8 @@ create_att_plot_4 <- function(model_eff, model_name, output_filename) {
 # Create and save plots for each model
 create_att_plot_4(dr.labor.0.9.eff, "", "att_labor_0_9.jpeg")
 
+# Create and save plots for robustness test
+create_att_plot_4(dr.labor.0.9.anticip.eff, "", "att_labor_0_9_anticip.jpeg")
 
 #Summaries of all ATTs to create comparative plot
 att_objs <- list(
@@ -407,6 +514,37 @@ comp.plot <- ggplot(att_staggered_df, aes(x = Variável, y = ATT)) +
 
 ggsave("comparative_plot.jpeg", plot = comp.plot, width = 8000, height = 6000, units = "px", dpi = 1000)
 
+#Summaries of all robustness tests ATTs to create comparative plot
+att_objs_anticip <- list(
+  "Deforestation" = dr.overall.deforestation.anticip.eff,
+  "Workers 0-4" = dr.labor.0.4.anticip.eff,
+  "Workers 0-9" = dr.labor.0.9.anticip.eff,
+  "Exports (upper)" = dr.upper.anticip.eff,
+  "Exports (lower)" = dr.lower.anticip.eff,
+  "Export total" = dr.overall.anticip.eff
+)
+
+att_staggered_df_anticip <- lapply(names(att_objs_anticip), function(name) {
+  obj <- att_objs_anticip[[name]]
+  data.frame(
+    Variável = name,
+    ATT = obj$overall.att,
+    CI_low = obj$overall.att - qnorm(0.95) * obj$overall.se,
+    CI_high = obj$overall.att + qnorm(0.95) * obj$overall.se
+  )
+}) %>% bind_rows()
+
+comp.plot_anticip <- ggplot(att_staggered_df_anticip, aes(x = Variável, y = ATT)) +
+  geom_point(size = 3) +
+  geom_errorbar(aes(ymin = CI_low, ymax = CI_high), width = 0.2) +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  labs(title = "ATT of Bonsucro-RED on multiple variables",
+       y = "ATT (90% CI)",
+       x = NULL) +
+  theme_minimal(base_size = 14) +
+  theme(axis.text.x = element_text(angle = 30, hjust = 1))
+
+ggsave("comparative_plot_anticip.jpeg", plot = comp.plot_anticip, width = 8000, height = 6000, units = "px", dpi = 1000)
 
 ##################################################################################
 #APPENDIX 

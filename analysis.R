@@ -1,5 +1,5 @@
 # Replication script for:
-# "Mixed Effects by Design? EU Biofuels and the Foreign Spillovers of Hybrid Climate Governance"
+# "The Foreign Spillovers of Hybrid Trade-Based Climate Governance"
 
 rm(list = ls())
 set.seed(123)

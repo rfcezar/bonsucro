@@ -1,4 +1,4 @@
-# Replication Package – *Mixed Effects by Design? EU Biofuels and the Foreign Spillovers of Hybrid Climate Governance*
+# Replication Package – *The Foreign Spillovers of Hybrid Trade-Based Climate Governance*
 
 This package contains the data and R code used to replicate the empirical results reported in the paper:
 
